@@ -4,6 +4,5 @@ package-lock.json
 yarn.lock
 app.json
 .buckconfig
-.flowconfig
 .watchmanconfig
 .gitattributes

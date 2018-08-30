@@ -1,8 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
 
 import React, { Component } from 'react';
 import {
@@ -10,17 +5,20 @@ import {
   StyleSheet,
   Text,
   View,
-  TouchableNativeFeedback,
+  TouchableHighlight,
 } from 'react-native';
 
+import moment from 'moment';
 
+import GestureRecognizer, { swipeDirections } from 'react-native-swipe-gestures';
 
+import CalendarTopBar from './CalendarTopBar';
 
 class App extends Component {
 
   componentDidMount() {
     let today = new Date();
-    date=today.getDate() + "/"+ parseInt(today.getMonth()+1) +"/"+ today.getFullYear();
+    date=today.getDate() + "/"+ parseInt(today.getMonth() + 1) +"/"+ today.getFullYear();
     console.log(this.getMonthMapping(today.getMonth()));
 
   }
@@ -90,6 +88,8 @@ class App extends Component {
     console.log('last day', lastDateOfCurrentMonth.getDate());
     let n = lastDateOfPreviousMonth.getDate() - firstDayOfCurrentMonth.getDay() + 1;
     console.log(n);
+    let today = date.getDate();
+    console.log('today', today);
     let currentMonthStarted = false;
     if(firstDayOfCurrentMonth.getDay() === 0){
       n = 1;
@@ -102,24 +102,24 @@ class App extends Component {
           n = 1;
           currentMonthStarted = true;
           cols.push(<View key={j} style={styles.elementOutOfMonth}>
-            <TouchableNativeFeedback>
+            <TouchableHighlight>
               <Text>{n++}</Text>
-            </TouchableNativeFeedback>
+            </TouchableHighlight>
           </View>);
         }
         else if (n > lastDateOfCurrentMonth.getDate() && currentMonthStarted){
           n = 1;
           cols.push(<View key={j} style={styles.elementOutOfMonth}>
-            <TouchableNativeFeedback>
+            <TouchableHighlight>
               <Text>{n++}</Text>
-            </TouchableNativeFeedback>
+            </TouchableHighlight>
           </View>);
         }
         else {
-          cols.push(<View key={j} style={styles.element}>
-            <TouchableNativeFeedback>
+          cols.push(<View key={j} style={ n === today ? styles.todaysDate : styles.element }>
+            <TouchableHighlight>
               <Text>{n++}</Text>
-            </TouchableNativeFeedback>
+            </TouchableHighlight>
           </View>);
         }
       }
@@ -133,10 +133,20 @@ class App extends Component {
 
     return (
       <View style={styles.container}>
+        <CalendarTopBar />
         <View style={styles.weekRow}>
           {days}
         </View>
+        <GestureRecognizer
+          onSwipeLeft={() => { console.log('left') }}
+          onSwipeRight={() => { console.log('right') }}
+          style={{
+            flex: 1,
+            width: '100%',
+          }}
+        >
         {rows}
+        </GestureRecognizer>
       </View>
     );
   }
@@ -148,6 +158,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
+    paddingTop: Platform.OS === 'ios' ? 30 : 0,
   },
   weekRow: {
     width: '100%',
@@ -157,21 +168,28 @@ const styles = StyleSheet.create({
   element: {
     flex: 1,
     padding: 5,
-    borderColor: '#555',
-    borderWidth: 0.15,
+    borderColor: 'rgba(55, 55, 55, .5)',
+    borderRightWidth: .5,
+    borderBottomWidth: .5,
     alignItems: 'flex-end',
     justifyContent: 'flex-start',
-    fontSize: 20,
+  },
+  todaysDate: {
+    flex: 1,
+    padding: 3,
+    alignItems: 'flex-end',
+    justifyContent: 'flex-start',
+    borderColor: 'rgb(55, 00, 00)',
+    borderWidth: 2,
   },
   elementOutOfMonth: {
     flex: 1,
     padding: 5,
-    borderColor: '#555',
-    borderWidth: 0.15,
+    borderColor: 'rgba(55, 55, 55, .5)',
+    borderRightWidth: .5,
+    borderBottomWidth: .5,
     alignItems: 'flex-end',
     justifyContent: 'flex-start',
-    color: '#555',
-    fontSize: 20,
   },
   dayElement: {
     flex: 1,
@@ -181,16 +199,6 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'stretch',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
   },
 });
 
